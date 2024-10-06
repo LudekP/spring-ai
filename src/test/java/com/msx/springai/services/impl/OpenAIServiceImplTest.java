@@ -14,7 +14,7 @@ class OpenAIServiceImplTest {
     @Test
     void getAnswer() {
 
-        String answer = openAIService.getAnswer("Tell me a dad joke.");
+        String answer = openAIService.getAnswer("Write a python script to output numbers from 1 to 100.");
         System.out.println("Answer: " + answer);
     }
 }
