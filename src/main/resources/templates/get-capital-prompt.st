@@ -1,1 +1,1 @@
-What is capital of {stateOrCountry}? Provide just the name
+What is capital of {stateOrCountry}? Respond in JSON with the name of the city in a property named cityName
