@@ -1,0 +1,1 @@
+What is capital of {stateOrCountry}? Provide just the name
