@@ -1,5 +1,6 @@
 package com.msx.springai.services.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.msx.springai.model.Answer;
 import com.msx.springai.model.GetCapitalRequest;
@@ -63,7 +64,20 @@ public class OpenAIServiceImpl implements OpenAIService {
         Prompt prompt = promptTemplate.create(Map.of("stateOrCountry", request.stateOrCountry()));
 
         ChatResponse response = chatModel.call(prompt);
-        return new Answer(response.getResult().getOutput().getContent());
+
+        // deserialize
+        String responseString;
+        try {
+            String content = response.getResult().getOutput().getContent();
+            JsonNode jsonNode = objectMapper.readTree(content.substring(content.indexOf("{"), content.lastIndexOf("}") + 1));
+            responseString = jsonNode.get("cityName").asText();
+            log.info("Deserialized response: {}", responseString);
+        } catch (Exception e) {
+            log.error("Failed to serialize response", e);
+            throw new RuntimeException(e);
+        }
+
+        return new Answer(responseString);
     }
 
     @Override
