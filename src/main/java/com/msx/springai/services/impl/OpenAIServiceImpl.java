@@ -1,9 +1,6 @@
 package com.msx.springai.services.impl;
 
-import com.msx.springai.model.Answer;
-import com.msx.springai.model.GetCapitalRequest;
-import com.msx.springai.model.GetCapitalResponse;
-import com.msx.springai.model.Question;
+import com.msx.springai.model.*;
 import com.msx.springai.services.OpenAIService;
 import groovy.util.logging.Slf4j;
 import org.springframework.ai.chat.model.ChatModel;
@@ -67,13 +64,14 @@ public class OpenAIServiceImpl implements OpenAIService {
     }
 
     @Override
-    public Answer getCapitalWithInfo(GetCapitalRequest request) {
+    public GetCapitalResponseWithInfo getCapitalWithInfo(GetCapitalRequest request) {
         log.info("You've asked for a capital city of {} with additional information", request);
+        BeanOutputConverter<GetCapitalResponseWithInfo> outputConverter = new BeanOutputConverter<>(GetCapitalResponseWithInfo.class);
         PromptTemplate promptTemplate = new PromptTemplate(getCapitalPromptWithInfo);
-        Prompt prompt = promptTemplate.create(Map.of("stateOrCountry", request.stateOrCountry()));
+        Prompt prompt = promptTemplate.create(Map.of("stateOrCountry", request.stateOrCountry(), "format", outputConverter.getFormat()));
 
         ChatResponse response = chatModel.call(prompt);
-        return new Answer(response.getResult().getOutput().getContent());
+        return outputConverter.convert(response.getResult().getOutput().getContent());
     }
 
 }

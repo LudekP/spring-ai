@@ -1,9 +1,6 @@
 package com.msx.springai.controllers;
 
-import com.msx.springai.model.Answer;
-import com.msx.springai.model.GetCapitalRequest;
-import com.msx.springai.model.GetCapitalResponse;
-import com.msx.springai.model.Question;
+import com.msx.springai.model.*;
 import com.msx.springai.services.OpenAIService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,7 +16,7 @@ public class QuestionController {
     }
 
     @PostMapping("/capitalWithInfo")
-    public Answer getCapitalWithInfo(@RequestBody GetCapitalRequest request) {
+    public GetCapitalResponseWithInfo getCapitalWithInfo(@RequestBody GetCapitalRequest request) {
         return openAIService.getCapitalWithInfo(request);
     }
 
