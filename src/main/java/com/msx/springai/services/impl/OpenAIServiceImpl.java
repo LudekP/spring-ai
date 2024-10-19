@@ -1,9 +1,8 @@
 package com.msx.springai.services.impl;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.msx.springai.model.Answer;
 import com.msx.springai.model.GetCapitalRequest;
+import com.msx.springai.model.GetCapitalResponse;
 import com.msx.springai.model.Question;
 import com.msx.springai.services.OpenAIService;
 import groovy.util.logging.Slf4j;
@@ -11,7 +10,7 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ai.converter.BeanOutputConverter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
@@ -28,9 +27,6 @@ public class OpenAIServiceImpl implements OpenAIService {
 
     @Value("classpath:templates/get-capital-prompt-with-info.st")
     private Resource getCapitalPromptWithInfo;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     private final ChatModel chatModel;
 
@@ -58,26 +54,16 @@ public class OpenAIServiceImpl implements OpenAIService {
     }
 
     @Override
-    public Answer getCapital(GetCapitalRequest request) {
+    public GetCapitalResponse getCapital(GetCapitalRequest request) {
         log.info("You've asked for a capital city of {}", request);
+        BeanOutputConverter<GetCapitalResponse> outputConverter = new BeanOutputConverter<>(GetCapitalResponse.class);
+        String format = outputConverter.getFormat();
         PromptTemplate promptTemplate = new PromptTemplate(getCapitalPrompt);
-        Prompt prompt = promptTemplate.create(Map.of("stateOrCountry", request.stateOrCountry()));
+        Prompt prompt = promptTemplate.create(Map.of("stateOrCountry", request.stateOrCountry(),
+                "format", format));
 
         ChatResponse response = chatModel.call(prompt);
-
-        // deserialize
-        String responseString;
-        try {
-            String content = response.getResult().getOutput().getContent();
-            JsonNode jsonNode = objectMapper.readTree(content.substring(content.indexOf("{"), content.lastIndexOf("}") + 1));
-            responseString = jsonNode.get("cityName").asText();
-            log.info("Deserialized response: {}", responseString);
-        } catch (Exception e) {
-            log.error("Failed to serialize response", e);
-            throw new RuntimeException(e);
-        }
-
-        return new Answer(responseString);
+        return outputConverter.convert(response.getResult().getOutput().getContent());
     }
 
     @Override

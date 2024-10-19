@@ -2,6 +2,7 @@ package com.msx.springai.controllers;
 
 import com.msx.springai.model.Answer;
 import com.msx.springai.model.GetCapitalRequest;
+import com.msx.springai.model.GetCapitalResponse;
 import com.msx.springai.model.Question;
 import com.msx.springai.services.OpenAIService;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,7 +24,7 @@ public class QuestionController {
     }
 
     @PostMapping("/capital")
-    public Answer getCapital(@RequestBody GetCapitalRequest request) {
+    public GetCapitalResponse getCapital(@RequestBody GetCapitalRequest request) {
         return openAIService.getCapital(request);
     }
 
