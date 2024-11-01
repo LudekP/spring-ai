@@ -2,9 +2,8 @@ package com.msx.springai.controllers;
 
 import com.msx.springai.model.*;
 import com.msx.springai.services.OpenAIService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 
 @RestController
 public class QuestionController {
@@ -13,6 +12,11 @@ public class QuestionController {
 
     public QuestionController(OpenAIService openAIService) {
         this.openAIService = openAIService;
+    }
+
+    @GetMapping(value = "/stream-response-for-question", produces = "text/event-stream")
+    public Flux<String> streamChatResponse(@RequestBody Question question) {
+        return openAIService.getAnswers(question);
     }
 
     @PostMapping("/capitalWithInfo")

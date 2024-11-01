@@ -2,19 +2,20 @@ package com.msx.springai.services.impl;
 
 import com.msx.springai.model.*;
 import com.msx.springai.services.OpenAIService;
-import groovy.util.logging.Slf4j;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.model.StreamingChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.converter.BeanOutputConverter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 
 import java.util.Map;
 
-@lombok.extern.slf4j.Slf4j
 @Slf4j
 @Service
 public class OpenAIServiceImpl implements OpenAIService {
@@ -38,6 +39,23 @@ public class OpenAIServiceImpl implements OpenAIService {
 
         ChatResponse response = chatModel.call(prompt);
         return response.getResult().getOutput().getContent();
+    }
+
+    @Override
+    public Flux<String> getAnswers(Question question) {
+        // Step 1: Create a prompt based on the question
+        PromptTemplate promptTemplate = new PromptTemplate(question.question());
+        Prompt prompt = promptTemplate.create();
+
+        // Step 2: Stream responses using chat model
+        Flux<ChatResponse> responseStream = chatModel.stream(prompt);
+
+        // Step 3: Transform each ChatResponse to String content
+        return responseStream
+                .map(chatResponse -> chatResponse.getResult() != null
+                        && chatResponse.getResult().getOutput() != null
+                        && chatResponse.getResult().getOutput().getContent() != null ? chatResponse.getResult().getOutput().getContent() : "")
+                .onErrorResume(e -> Flux.just("Error: " + e.getMessage()));
     }
 
     @Override
