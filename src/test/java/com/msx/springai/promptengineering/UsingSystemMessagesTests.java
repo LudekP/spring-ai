@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Created by jt, Spring Framework Guru.
  */
-@SpringBootTest
+//@SpringBootTest
 public class UsingSystemMessagesTests extends BaseTestClass {
 
     @Test

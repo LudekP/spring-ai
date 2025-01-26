@@ -15,7 +15,7 @@ import java.util.UUID;
 /**
  * Created by jt, Spring Framework Guru.
  */
-@SpringBootTest
+//@SpringBootTest
 public class ZeroAndFewShotTests extends BaseTestClass {
 
     @Autowired
@@ -55,7 +55,7 @@ public class ZeroAndFewShotTests extends BaseTestClass {
     void zeroShotPromptTestWithModelOptions() {
 
         OpenAiChatOptions openAiChatOptions = new OpenAiChatOptions.Builder(openAiChatProperties.getOptions())
-                .withTemperature(0.1f) //default is 0.7
+                .withTemperature(0.1) //default is 0.7
                 .withModel("gpt-4-turbo-preview")
                 .build();
 

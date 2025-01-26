@@ -34,4 +34,9 @@ public class QuestionController {
         return openAIService.getAnswer(question);
     }
 
+    @PostMapping("/ask/movies")
+    public Answer askQuestionAboutMovies(@RequestBody Question question) {
+        return openAIService.getMovieAnswerRAG(question);
+    }
+
 }

@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * Created by jt, Spring Framework Guru.
  */
-@SpringBootTest
+//@SpringBootTest
 public class MakingTheModelThinkTests extends BaseTestClass {
 
     String story = """

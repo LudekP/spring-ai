@@ -4,3 +4,9 @@ spring:
   ai:
     openai:
       api-key: ${OPENAI_API_KEY}
+
+sfg:
+  aiapp:
+    vectorStorePath: G:\Git\sfg\spring-ai\src\main\resources\vectorstore\vectorstore.json
+    documentsToLoad:
+      - classpath:/movies500.csv
