@@ -29,7 +29,7 @@ public class OpenAIServiceImpl implements OpenAIService {
     @Value("classpath:templates/get-capital-prompt-with-info.st")
     private Resource getCapitalPromptWithInfo;
 
-    @Value("classpath:templates/rag-prompt-template.st")
+    @Value("classpath:templates/rag-prompt-template-meta.st")
     private Resource getRagPrompt;
 
     private final ChatModel chatModel;
@@ -103,7 +103,7 @@ public class OpenAIServiceImpl implements OpenAIService {
     @Override
     public Answer getMovieAnswerRAG(Question question) {
         log.info("You've asked question: {}", question);
-        List<Document> documents = vectorStore.similaritySearch(SearchRequest.builder().query(question.question()).topK(5).build());
+        List<Document> documents = vectorStore.similaritySearch(SearchRequest.builder().query(question.question()).topK(4).build());
         List<String> context = documents.stream().map(Document::getContent).toList();
         PromptTemplate promptTemplate = new PromptTemplate(getRagPrompt);
         Prompt prompt = promptTemplate.create(Map.of("input", question.question(), "documents", String.join("\n", context)));

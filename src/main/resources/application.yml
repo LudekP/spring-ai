@@ -4,9 +4,12 @@ spring:
   ai:
     openai:
       api-key: ${OPENAI_API_KEY}
+      embedding:
+        options:
+          model: text-embedding-3-small
 
 sfg:
   aiapp:
     vectorStorePath: G:\Git\sfg\spring-ai\src\main\resources\vectorstore\vectorstore.json
     documentsToLoad:
-      - classpath:/movies500.csv
+      - classpath:/movies500Trimmed.csv
