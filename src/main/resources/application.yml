@@ -7,7 +7,18 @@ spring:
       embedding:
         options:
           model: text-embedding-3-small
-
+    vectorstore:
+      milvus:
+        client:
+          host: "homelab"
+          port: 19530
+          username: "root"
+          password: "milvus"
+        databaseName: "sfg"
+        collectionName: "sfg_vector_store"
+        embeddingDimension: 1536
+        indexType: IVF_FLAT
+        metricType: COSINE
 sfg:
   aiapp:
     vectorStorePath: G:\Git\sfg\spring-ai\src\main\resources\vectorstore\vectorstore.json

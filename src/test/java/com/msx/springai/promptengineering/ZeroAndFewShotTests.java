@@ -47,7 +47,7 @@ public class ZeroAndFewShotTests extends BaseTestClass {
             ChatResponse response = openAiChatClient.call(promptTemplate.create());
 
             System.out.println("#################################\n");
-            System.out.println(response.getResult().getOutput().getContent());
+            System.out.println(response.getResult().getOutput().getText());
         }
     }
 
@@ -55,8 +55,8 @@ public class ZeroAndFewShotTests extends BaseTestClass {
     void zeroShotPromptTestWithModelOptions() {
 
         OpenAiChatOptions openAiChatOptions = new OpenAiChatOptions.Builder(openAiChatProperties.getOptions())
-                .withTemperature(0.1) //default is 0.7
-                .withModel("gpt-4-turbo-preview")
+                .temperature(0.1) //default is 0.7
+                .model("gpt-4-turbo-preview")
                 .build();
 
         // java for loop 3 times
@@ -70,7 +70,7 @@ public class ZeroAndFewShotTests extends BaseTestClass {
             ChatResponse response = openAiChatClient.call(prompt);
 
             System.out.println("#################################\n");
-            System.out.println(response.getResult().getOutput().getContent());
+            System.out.println(response.getResult().getOutput().getText());
         }
     }
 
@@ -93,7 +93,7 @@ public class ZeroAndFewShotTests extends BaseTestClass {
     void testwhatPuPromptFewShotTest() {
         PromptTemplate promptTemplate = new PromptTemplate(whatpuPrompt);
 
-        System.out.println(openAiChatClient.call(promptTemplate.create()).getResult().getOutput().getContent());
+        System.out.println(openAiChatClient.call(promptTemplate.create()).getResult().getOutput().getText());
     }
 
     String vacationPrompt = """
@@ -106,7 +106,7 @@ public class ZeroAndFewShotTests extends BaseTestClass {
     void testVacationFewShotTest() {
         PromptTemplate promptTemplate = new PromptTemplate(vacationPrompt);
 
-        System.out.println(openAiChatClient.call(promptTemplate.create()).getResult().getOutput().getContent());
+        System.out.println(openAiChatClient.call(promptTemplate.create()).getResult().getOutput().getText());
     }
 
     String mathPrompt = """
@@ -121,7 +121,7 @@ public class ZeroAndFewShotTests extends BaseTestClass {
     void testMathPromptFewShotTest() {
         PromptTemplate promptTemplate = new PromptTemplate(mathPrompt);
 
-        System.out.println(openAiChatClient.call(promptTemplate.create()).getResult().getOutput().getContent());
+        System.out.println(openAiChatClient.call(promptTemplate.create()).getResult().getOutput().getText());
     }
 
     @Test
@@ -129,6 +129,6 @@ public class ZeroAndFewShotTests extends BaseTestClass {
         Prompt prompt = new Prompt("Write sales copy for the new 'professional grade' " +
                 "Denali Advanced Toothbrush by GMC.");
 
-        System.out.println(openAiChatClient.call(prompt).getResult().getOutput().getContent());
+        System.out.println(openAiChatClient.call(prompt).getResult().getOutput().getText());
     }
 }

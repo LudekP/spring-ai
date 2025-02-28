@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import java.io.File;
 import java.util.List;
 
-@Configuration
+//@Configuration
 public class VectorStoreConfig {
 
     @Bean

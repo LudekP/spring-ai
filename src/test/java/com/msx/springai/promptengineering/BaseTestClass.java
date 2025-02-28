@@ -6,7 +6,7 @@ import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-//@SpringBootTest
+@SpringBootTest
 public class BaseTestClass {
 
     @Autowired
@@ -16,7 +16,7 @@ public class BaseTestClass {
         PromptTemplate promptTemplate = new PromptTemplate(prompt);
         Prompt promptToSend = promptTemplate.create();
 
-        return openAiChatClient.call(promptToSend).getResult().getOutput().getContent();
+        return openAiChatClient.call(promptToSend).getResult().getOutput().getText();
     }
 
 }

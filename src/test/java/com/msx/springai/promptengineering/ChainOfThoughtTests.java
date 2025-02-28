@@ -31,7 +31,7 @@ public class ChainOfThoughtTests extends BaseTestClass {
         ChatResponse response = openAiChatClient.call(promptTemplate.create());
 
         //models previously would answer 27
-        System.out.println(response.getResult().getOutput().getContent());
+        System.out.println(response.getResult().getOutput().getText());
     }
 
     @Test
@@ -50,7 +50,7 @@ public class ChainOfThoughtTests extends BaseTestClass {
 
         ChatResponse response = openAiChatClient.call(promptTemplate.create());
 
-        System.out.println(response.getResult().getOutput().getContent());
+        System.out.println(response.getResult().getOutput().getText());
     }
 
     @Test
@@ -65,6 +65,6 @@ public class ChainOfThoughtTests extends BaseTestClass {
         ChatResponse response = openAiChatClient.call(promptTemplate.create());
 
         //models previously would answer 27
-        System.out.println(response.getResult().getOutput().getContent());
+        System.out.println(response.getResult().getOutput().getText());
     }
 }

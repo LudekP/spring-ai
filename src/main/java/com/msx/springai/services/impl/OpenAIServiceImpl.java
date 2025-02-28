@@ -10,7 +10,7 @@ import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.converter.BeanOutputConverter;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
-import org.springframework.ai.vectorstore.SimpleVectorStore;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
@@ -33,9 +33,9 @@ public class OpenAIServiceImpl implements OpenAIService {
     private Resource getRagPrompt;
 
     private final ChatModel chatModel;
-    private final SimpleVectorStore vectorStore;
+    private final VectorStore vectorStore;
 
-    public OpenAIServiceImpl(ChatModel chatModel, SimpleVectorStore vectorStore) {
+    public OpenAIServiceImpl(ChatModel chatModel, VectorStore vectorStore) {
         this.chatModel = chatModel;
         this.vectorStore = vectorStore;
     }
@@ -46,7 +46,7 @@ public class OpenAIServiceImpl implements OpenAIService {
         Prompt prompt = promptTemplate.create();
 
         ChatResponse response = chatModel.call(prompt);
-        return response.getResult().getOutput().getContent();
+        return response.getResult().getOutput().getText();
     }
 
     @Override
@@ -62,7 +62,7 @@ public class OpenAIServiceImpl implements OpenAIService {
         return responseStream
                 .map(chatResponse -> chatResponse.getResult() != null
                         && chatResponse.getResult().getOutput() != null
-                        && chatResponse.getResult().getOutput().getContent() != null ? chatResponse.getResult().getOutput().getContent() : "")
+                        && chatResponse.getResult().getOutput().getText() != null ? chatResponse.getResult().getOutput().getText() : "")
                 .onErrorResume(e -> Flux.just("Error: " + e.getMessage()));
     }
 
@@ -73,7 +73,7 @@ public class OpenAIServiceImpl implements OpenAIService {
         Prompt prompt = promptTemplate.create();
 
         ChatResponse response = chatModel.call(prompt);
-        return new Answer(response.getResult().getOutput().getContent());
+        return new Answer(response.getResult().getOutput().getText());
     }
 
     @Override
@@ -86,7 +86,7 @@ public class OpenAIServiceImpl implements OpenAIService {
                 "format", format));
 
         ChatResponse response = chatModel.call(prompt);
-        return outputConverter.convert(response.getResult().getOutput().getContent());
+        return outputConverter.convert(response.getResult().getOutput().getText());
     }
 
     @Override
@@ -97,19 +97,19 @@ public class OpenAIServiceImpl implements OpenAIService {
         Prompt prompt = promptTemplate.create(Map.of("stateOrCountry", request.stateOrCountry(), "format", outputConverter.getFormat()));
 
         ChatResponse response = chatModel.call(prompt);
-        return outputConverter.convert(response.getResult().getOutput().getContent());
+        return outputConverter.convert(response.getResult().getOutput().getText());
     }
 
     @Override
     public Answer getMovieAnswerRAG(Question question) {
         log.info("You've asked question: {}", question);
         List<Document> documents = vectorStore.similaritySearch(SearchRequest.builder().query(question.question()).topK(4).build());
-        List<String> context = documents.stream().map(Document::getContent).toList();
+        List<String> context = documents.stream().map(Document::getText).toList();
         PromptTemplate promptTemplate = new PromptTemplate(getRagPrompt);
         Prompt prompt = promptTemplate.create(Map.of("input", question.question(), "documents", String.join("\n", context)));
 
         ChatResponse response = chatModel.call(prompt);
-        return new Answer(response.getResult().getOutput().getContent());
+        return new Answer(response.getResult().getOutput().getText());
     }
 
 }
