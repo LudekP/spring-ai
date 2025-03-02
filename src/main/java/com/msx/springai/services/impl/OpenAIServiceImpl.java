@@ -133,7 +133,7 @@ public class OpenAIServiceImpl implements OpenAIService {
 
     @Override
     public Answer getWeatherAnswer(Question question) {
-        return null;
+        return new Answer("Not implemented yet");
     }
 
 }
