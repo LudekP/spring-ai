@@ -37,22 +37,14 @@ public class LoadVectorStore implements CommandLineRunner {
     @Autowired
     private VectorStoreProperties vectorStoreProperties;
 
-    @Autowired
-    private MilvusClient milvusClient;
-
 
     @Override
     public void run(String... args) throws Exception {
 
         log.debug("Loading vector store...");
-
-        // Step 2: Check if the collection already exists
-        ListCollectionsParam param = ListCollectionsParam.newBuilder().build();
-        R<ListCollectionsResponse> collections = milvusClient.listCollections(param);
-
         if (vectorStore.similaritySearch("Sportsman").isEmpty()) {
             vectorStoreProperties.getDocumentsToLoad().forEach(document -> {
-                log.info("Vector store is empty, loading data...");
+                log.info("Vector store is empty, loading document {}", document.getFilename());
                 TikaDocumentReader documentReader = new TikaDocumentReader(document);
                 List<Document> documents = documentReader.get();
                 TextSplitter textSplitter = new TokenTextSplitter();

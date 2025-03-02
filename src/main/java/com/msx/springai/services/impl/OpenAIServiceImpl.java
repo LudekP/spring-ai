@@ -3,6 +3,7 @@ package com.msx.springai.services.impl;
 import com.msx.springai.model.*;
 import com.msx.springai.services.OpenAIService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
@@ -29,8 +30,11 @@ public class OpenAIServiceImpl implements OpenAIService {
     @Value("classpath:templates/get-capital-prompt-with-info.st")
     private Resource getCapitalPromptWithInfo;
 
-    @Value("classpath:templates/rag-prompt-template-meta.st")
+    @Value("classpath:templates/rag-prompt-template.st")
     private Resource getRagPrompt;
+
+    @Value("classpath:templates/system-message.st")
+    private Resource getBoatTowSystemMessage;
 
     private final ChatModel chatModel;
     private final VectorStore vectorStore;
@@ -110,6 +114,26 @@ public class OpenAIServiceImpl implements OpenAIService {
 
         ChatResponse response = chatModel.call(prompt);
         return new Answer(response.getResult().getOutput().getText());
+    }
+
+    @Override
+    public Answer getBoatTowAnswerRAG(Question question) {
+        PromptTemplate systemMessageTemplate = new PromptTemplate(getBoatTowSystemMessage);
+        Message systemMessage = systemMessageTemplate.createMessage();
+
+        log.info("You've asked question: {}", question);
+        List<Document> documents = vectorStore.similaritySearch(SearchRequest.builder().query(question.question()).topK(2).build());
+        List<String> context = documents.stream().map(Document::getText).toList();
+        PromptTemplate promptTemplate = new PromptTemplate(getRagPrompt);
+        Message userMessage = promptTemplate.createMessage(Map.of("input", question.question(), "documents", String.join("\n", context)));
+
+        ChatResponse response = chatModel.call(new Prompt(List.of(systemMessage, userMessage)));
+        return new Answer(response.getResult().getOutput().getText());
+    }
+
+    @Override
+    public Answer getWeatherAnswer(Question question) {
+        return null;
     }
 
 }
