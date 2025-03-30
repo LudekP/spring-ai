@@ -28,6 +28,7 @@ spring:
 
 sfg:
   aiapp:
+    apiNinjasKey: ${API_NINJAS_KEY}
     vectorStorePath: /tmp/vectorstore.json
     documentsToLoad:
       - classpath:/towvehicles.txt

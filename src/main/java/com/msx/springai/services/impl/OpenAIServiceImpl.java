@@ -1,5 +1,6 @@
 package com.msx.springai.services.impl;
 
+import com.msx.springai.functions.WeatherServiceFunction;
 import com.msx.springai.model.*;
 import com.msx.springai.services.OpenAIService;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +11,9 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.converter.BeanOutputConverter;
 import org.springframework.ai.document.Document;
+import org.springframework.ai.model.function.FunctionCallback;
+import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,12 +40,17 @@ public class OpenAIServiceImpl implements OpenAIService {
     @Value("classpath:templates/system-message.st")
     private Resource getBoatTowSystemMessage;
 
+    @Value("${sfg.aiapp.apiNinjasKey}")
+    private String apiNinjasKey;
+
     private final ChatModel chatModel;
     private final VectorStore vectorStore;
+    private final OpenAiChatModel openAiChatModel;
 
-    public OpenAIServiceImpl(ChatModel chatModel, VectorStore vectorStore) {
+    public OpenAIServiceImpl(ChatModel chatModel, VectorStore vectorStore, OpenAiChatModel openAiChatModel) {
         this.chatModel = chatModel;
         this.vectorStore = vectorStore;
+        this.openAiChatModel = openAiChatModel;
     }
 
     @Override
@@ -133,7 +142,21 @@ public class OpenAIServiceImpl implements OpenAIService {
 
     @Override
     public Answer getWeatherAnswer(Question question) {
-        return new Answer("Not implemented yet");
+        FunctionCallback functionCallback = FunctionCallback.builder()
+                .function("CurrentWeather", new WeatherServiceFunction(apiNinjasKey))
+                .description("Get the current weather for a location")
+                .inputType(WeatherRequest.class) // Explicitly specify the input type
+                .build();
+
+        var promptOptions = OpenAiChatOptions.builder()
+                .functionCallbacks(List.of(functionCallback))
+                .build();
+
+        Message userMessage = new PromptTemplate(question.question()).createMessage();
+
+        var response = openAiChatModel.call(new Prompt(List.of(userMessage), promptOptions));
+
+        return new Answer(response.getResult().getOutput().getText());
     }
 
 }
